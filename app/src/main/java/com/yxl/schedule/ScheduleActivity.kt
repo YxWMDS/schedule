@@ -6,7 +6,7 @@ import androidx.fragment.app.commit
 import com.yxl.schedule.databinding.ActivityMainBinding
 import com.yxl.schedule.ui.ScheduleFragment
 
-class MainActivity : AppCompatActivity() {
+class ScheduleActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
