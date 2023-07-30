@@ -6,14 +6,14 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.yxl.schedule.databinding.ScheduleItemBinding
-import com.yxl.schedule.models.Schedule
+import com.yxl.schedule.models.ScheduleData
 
 class ScheduleAdapter() : RecyclerView.Adapter<ScheduleAdapter.ViewHolder>() {
 
     class ViewHolder(val binding: ScheduleItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(schedule: Schedule) = with(binding){
-            tvSubName.text = schedule.subject.full
+        fun bind(schedule: ScheduleData.Data.Schedule) = with(binding){
+            tvSubName.text = schedule.subject.abbreviated
             tvSubType.text = schedule.type.abbreviated
             tvProfName.text = schedule.teacher.fullName
             tvStartTime.text = schedule.time.start
@@ -34,12 +34,12 @@ class ScheduleAdapter() : RecyclerView.Adapter<ScheduleAdapter.ViewHolder>() {
         holder.bind(differ.currentList[position])
     }
 
-    private val differCallBack = object : DiffUtil.ItemCallback<Schedule>(){
-        override fun areItemsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
+    private val differCallBack = object : DiffUtil.ItemCallback<ScheduleData.Data.Schedule>(){
+        override fun areItemsTheSame(oldItem: ScheduleData.Data.Schedule, newItem: ScheduleData.Data.Schedule): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
+        override fun areContentsTheSame(oldItem: ScheduleData.Data.Schedule, newItem: ScheduleData.Data.Schedule): Boolean {
             return oldItem == newItem
         }
     }
