@@ -8,18 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yxl.schedule.adapters.ScheduleAdapter
 import com.yxl.schedule.databinding.DialogSearchBinding
 import com.yxl.schedule.databinding.FragmentScheduleBinding
-import com.yxl.schedule.models.Data
-import com.yxl.schedule.models.Schedule
+import com.yxl.schedule.models.ScheduleData
 import com.yxl.schedule.network.ScheduleApi
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,27 +42,35 @@ class ScheduleFragment : Fragment() {
         }
     }
 
-    private fun setUpRecycler(){
+    private fun setUpRecycler() {
         binding.apply {
             rvSchedule.layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
-    private fun setUpToolbar(){
+    private fun setUpToolbar() {
 
     }
 
-    private fun onSearchGroupClick(){
+    private fun onSearchGroupClick() {
         val group: String?
         val subgroup: String?
 
     }
 
-    private fun setUpDialog(){
+    private fun setUpDialog() {
         val list = listOf("1", "ИП291", "3", "4")
         val list2 = listOf("1", "2")
-        val spinnerGroupAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, list)
-        val spinnerSubgroupAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, list2)
+        val spinnerGroupAdapter = ArrayAdapter(
+            requireContext(),
+            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
+            list
+        )
+        val spinnerSubgroupAdapter = ArrayAdapter(
+            requireContext(),
+            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
+            list2
+        )
         val dialogBinding = DialogSearchBinding.inflate(LayoutInflater.from(layoutInflater.context))
 
         val searchDialog = AlertDialog.Builder(context)
@@ -81,11 +84,11 @@ class ScheduleFragment : Fragment() {
 
             etProf.isEnabled = sProfessor.isChecked
             sProfessor.setOnCheckedChangeListener { _, isChecked ->
-                if(isChecked){
+                if (isChecked) {
                     etProf.isClickable = true
                     spinnerGroups.isClickable = false
                     spinnerSubgroups.isClickable = false
-                }else{
+                } else {
                     etProf.isClickable = false
                     spinnerGroups.isClickable = true
                     spinnerSubgroups.isClickable = true
@@ -93,10 +96,13 @@ class ScheduleFragment : Fragment() {
             }
 
             bConfirm.setOnClickListener {
-                if(sProfessor.isChecked){
+                if (sProfessor.isChecked) {
                     getProfessorSchedule(etProf.text.toString())
-                }else{
-                    getStudentSchedule(spinnerGroups.selectedItem.toString(), spinnerSubgroups.selectedItem.toString())
+                } else {
+                    getStudentSchedule(
+                        spinnerGroups.selectedItem.toString(),
+                        spinnerSubgroups.selectedItem.toString()
+                    )
                 }
                 searchDialog.cancel()
             }
@@ -106,29 +112,33 @@ class ScheduleFragment : Fragment() {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun getStudentSchedule(group: String, subgroup: String){
-//        GlobalScope.launch(Dispatchers.IO){
+    private fun getStudentSchedule(group: String, subgroup: String) {
         val params = mutableMapOf<String, String>()
         params["group"] = group
         params["subgroup"] = subgroup
         params["weekdays[]"] = "1"
 
         val scheduleList = ScheduleApi().getSchedule(params)
-            scheduleList.enqueue(object : Callback<Data>{
+        scheduleAdapter = ScheduleAdapter()
+        scheduleList.enqueue(object : Callback<ScheduleData> {
 
-                override fun onResponse(call: Call<Data>, response: Response<Data>) {
-                    Log.d("successFragment", "success")
-                }
+            override fun onResponse(call: Call<ScheduleData>, response: Response<ScheduleData>) {
+                scheduleAdapter.differ.submitList(response.body()?.data?.schedule)
+                binding.rvSchedule.adapter = scheduleAdapter
+                Log.d("successFragment", "success")
+                Log.d("successFragment", scheduleList.request().url().toString())
+                Log.d("successFragment", response.body()?.data?.group?.name.toString())
 
-                override fun onFailure(call: Call<Data>, t: Throwable) {
-                    Log.d("ScheduleFragment", scheduleList.request().url().toString())
-                }
-            })
-//        }
+            }
+
+            override fun onFailure(call: Call<ScheduleData>, t: Throwable) {
+                Log.d("ScheduleFragment", scheduleList.request().url().toString())
+            }
+        })
 
     }
 
-    private fun getProfessorSchedule(name: String){
+    private fun getProfessorSchedule(name: String) {
 
     }
 
