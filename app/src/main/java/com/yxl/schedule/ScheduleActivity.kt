@@ -12,7 +12,6 @@ class ScheduleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(findViewById(R.id.toolbar))
 
         supportFragmentManager.commit {
             val scheduleFragment = ScheduleFragment()
