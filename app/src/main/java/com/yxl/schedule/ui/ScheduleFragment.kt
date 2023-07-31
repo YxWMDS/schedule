@@ -10,12 +10,16 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.yxl.schedule.adapters.ScheduleAdapter
+import com.yxl.schedule.adapters.StudentScheduleAdapter
+import com.yxl.schedule.adapters.TeacherScheduleAdapter
 import com.yxl.schedule.databinding.DialogSearchBinding
 import com.yxl.schedule.databinding.FragmentScheduleBinding
+import com.yxl.schedule.models.Groups
 import com.yxl.schedule.models.ScheduleData
 import com.yxl.schedule.network.ScheduleApi
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,7 +28,9 @@ import retrofit2.Response
 class ScheduleFragment : Fragment() {
 
     private lateinit var binding: FragmentScheduleBinding
-    private lateinit var scheduleAdapter: ScheduleAdapter
+    private lateinit var studentScheduleAdapter: StudentScheduleAdapter
+    private lateinit var teacherScheduleAdapter: TeacherScheduleAdapter
+    private val groupsList = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +45,7 @@ class ScheduleFragment : Fragment() {
         setUpToolbar()
         binding.rvSchedule.layoutManager = LinearLayoutManager(requireContext())
         setUpRecycler()
+        getGroups()
         binding.fabSearchGroup.setOnClickListener {
             setUpDialog()
         }
@@ -55,12 +62,11 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun setUpDialog() {
-        val list = listOf("1", "ИП291", "3", "4")
         val list2 = listOf("1", "2")
         val spinnerGroupAdapter = ArrayAdapter(
             requireContext(),
             androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
-            list
+            groupsList
         )
         val spinnerSubgroupAdapter = ArrayAdapter(
             requireContext(),
@@ -107,7 +113,26 @@ class ScheduleFragment : Fragment() {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
+    private fun getGroups(){
+        val groupsResponse = ScheduleApi().getGroups()
+        groupsResponse.enqueue(object : Callback<Groups> {
+            override fun onResponse(
+                call: Call<Groups>,
+                response: Response<Groups>
+            ) {
+                Log.d("ScheduleFragment", response.body().toString())
+                for(i in response.body()?.data!!){
+                    groupsList.add(i.name)
+                }
+            }
+
+            override fun onFailure(call: Call<Groups>, t: Throwable) {
+                Log.d("ScheduleFragment", t.message.toString())
+            }
+
+        })
+    }
+
     private fun getStudentSchedule(group: String, subgroup: String) {
         val params = mutableMapOf<String, String>()
         params["group"] = group
@@ -115,16 +140,12 @@ class ScheduleFragment : Fragment() {
         params["weekdays[]"] = "1"
 
         val scheduleList = ScheduleApi().getSchedule(params)
-        scheduleAdapter = ScheduleAdapter()
+        studentScheduleAdapter = StudentScheduleAdapter()
         scheduleList.enqueue(object : Callback<ScheduleData> {
 
             override fun onResponse(call: Call<ScheduleData>, response: Response<ScheduleData>) {
-                scheduleAdapter.differ.submitList(response.body()?.data?.schedule)
-                binding.rvSchedule.adapter = scheduleAdapter
-                Log.d("successFragment", "success")
-                Log.d("successFragment", scheduleList.request().url().toString())
-                Log.d("successFragment", response.body()?.data?.group?.name.toString())
-
+                studentScheduleAdapter.differ.submitList(response.body()?.data?.schedule)
+                binding.rvSchedule.adapter = studentScheduleAdapter
             }
 
             override fun onFailure(call: Call<ScheduleData>, t: Throwable) {
@@ -135,6 +156,20 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun getProfessorSchedule(name: String) {
+        val params = mutableMapOf<String, String>()
+        params.put("teacher", name)
+        params.put("weekdays[]", "1")
+        teacherScheduleAdapter = TeacherScheduleAdapter()
+        CoroutineScope(Dispatchers.Main).launch{
+            val professorSchedule = ScheduleApi().getProfessorSchedule(params)
+
+            if(professorSchedule.isSuccessful){
+                teacherScheduleAdapter.differ.submitList(professorSchedule.body()?.data?.schedule)
+                binding.rvSchedule.adapter = teacherScheduleAdapter
+            }else{
+                Log.d("errorTAG", professorSchedule.raw().request().url().toString())
+            }
+        }
 
     }
 
