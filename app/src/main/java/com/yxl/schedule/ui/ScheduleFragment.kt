@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yxl.schedule.adapters.ScheduleAdapter
 import com.yxl.schedule.databinding.DialogSearchBinding
@@ -35,6 +36,7 @@ class ScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpToolbar()
         binding.rvSchedule.layoutManager = LinearLayoutManager(requireContext())
         setUpRecycler()
         binding.fabSearchGroup.setOnClickListener {
@@ -49,13 +51,7 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun setUpToolbar() {
-
-    }
-
-    private fun onSearchGroupClick() {
-        val group: String?
-        val subgroup: String?
-
+        binding.toolbar.toolbarBack.isVisible = false
     }
 
     private fun setUpDialog() {
@@ -85,13 +81,13 @@ class ScheduleFragment : Fragment() {
             etProf.isEnabled = sProfessor.isChecked
             sProfessor.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    etProf.isClickable = true
-                    spinnerGroups.isClickable = false
-                    spinnerSubgroups.isClickable = false
+                    etProf.isEnabled = true
+                    spinnerGroups.isEnabled = false
+                    spinnerSubgroups.isEnabled = false
                 } else {
-                    etProf.isClickable = false
-                    spinnerGroups.isClickable = true
-                    spinnerSubgroups.isClickable = true
+                    etProf.isEnabled = false
+                    spinnerGroups.isEnabled = true
+                    spinnerSubgroups.isEnabled = true
                 }
             }
 

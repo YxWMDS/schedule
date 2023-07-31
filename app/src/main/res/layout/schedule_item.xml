@@ -2,6 +2,11 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginStart="6dp"
+    android:layout_marginEnd="6dp"
+    app:cardCornerRadius="5dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,7 +19,7 @@
             android:id="@+id/tvStartTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
             android:text="13:00"
             android:textSize="15sp"
@@ -25,7 +30,7 @@
             android:id="@+id/tvEndTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="16dp"
             android:text="14:20"
             android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,10 +41,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="50dp"
+            android:layout_marginEnd="80dp"
             android:text="Практ. грамматика"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tvStartTime"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +56,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:text="ПЗ"
-            android:textSize="18sp"
+            android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@id/tvStartTime"
             app:layout_constraintTop_toBottomOf="@id/tvSubName" />
 
@@ -69,10 +74,12 @@
             android:id="@+id/tvSubRoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:layout_marginEnd="32dp"
             android:text="Д409"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvSubType" />
+            app:layout_constraintStart_toEndOf="@+id/tvSubName"
+            app:layout_constraintTop_toTopOf="@+id/tvSubName" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
