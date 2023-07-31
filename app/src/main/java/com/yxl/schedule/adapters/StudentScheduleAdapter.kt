@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yxl.schedule.databinding.ScheduleItemBinding
 import com.yxl.schedule.models.ScheduleData
 
-class ScheduleAdapter() : RecyclerView.Adapter<ScheduleAdapter.ViewHolder>() {
+class StudentScheduleAdapter() : RecyclerView.Adapter<StudentScheduleAdapter.ViewHolder>() {
 
     class ViewHolder(val binding: ScheduleItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
