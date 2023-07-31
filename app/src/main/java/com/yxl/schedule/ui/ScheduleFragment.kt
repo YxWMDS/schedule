@@ -54,6 +54,12 @@ class ScheduleFragment : Fragment() {
         binding.toolbar.toolbarBack.isVisible = false
     }
 
+    private fun onSearchGroupClick() {
+        val group: String?
+        val subgroup: String?
+
+    }
+
     private fun setUpDialog() {
         val list = listOf("1", "ИП291", "3", "4")
         val list2 = listOf("1", "2")
@@ -88,6 +94,13 @@ class ScheduleFragment : Fragment() {
                     etProf.isEnabled = false
                     spinnerGroups.isEnabled = true
                     spinnerSubgroups.isEnabled = true
+                    etProf.isClickable = true
+                    spinnerGroups.isClickable = false
+                    spinnerSubgroups.isClickable = false
+                } else {
+                    etProf.isClickable = false
+                    spinnerGroups.isClickable = true
+                    spinnerSubgroups.isClickable = true
                 }
             }
 
