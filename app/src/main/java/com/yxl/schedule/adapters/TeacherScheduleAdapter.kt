@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.yxl.schedule.databinding.ScheduleTeacherItemBinding
-import com.yxl.schedule.models.TeacherData
+import com.yxl.schedule.model.TeacherData
 
 class TeacherScheduleAdapter : RecyclerView.Adapter<TeacherScheduleAdapter.ViewHolder>() {
 

@@ -1,6 +1,7 @@
 package com.yxl.schedule.ui
 
 import android.app.AlertDialog
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,20 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yxl.schedule.adapters.StudentScheduleAdapter
 import com.yxl.schedule.adapters.TeacherScheduleAdapter
+import com.yxl.schedule.data.ScheduleRepository
 import com.yxl.schedule.databinding.DialogSearchBinding
 import com.yxl.schedule.databinding.FragmentScheduleBinding
-import com.yxl.schedule.models.Groups
-import com.yxl.schedule.models.ScheduleData
-import com.yxl.schedule.network.ScheduleApi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
 class ScheduleFragment : Fragment() {
@@ -30,13 +25,14 @@ class ScheduleFragment : Fragment() {
     private lateinit var binding: FragmentScheduleBinding
     private lateinit var studentScheduleAdapter: StudentScheduleAdapter
     private lateinit var teacherScheduleAdapter: TeacherScheduleAdapter
-    private val groupsList = mutableListOf<String>()
+    private val viewModel: ScheduleViewModel by activityViewModels{ viewModelProvider }
+    private val repository = ScheduleRepository()
+    private val viewModelProvider = ScheduleViewModelProvider(repository)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentScheduleBinding.inflate(layoutInflater, container, false)
+        Log.d("ViewModel", viewModel.toString())
         return binding.root
     }
 
@@ -44,21 +40,34 @@ class ScheduleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpToolbar()
         binding.rvSchedule.layoutManager = LinearLayoutManager(requireContext())
-        setUpRecycler()
+
         getGroups()
         binding.fabSearchGroup.setOnClickListener {
             setUpDialog()
         }
     }
 
-    private fun setUpRecycler() {
+    private fun setUpStudentRecycler() {
         binding.apply {
+            studentScheduleAdapter = StudentScheduleAdapter()
             rvSchedule.layoutManager = LinearLayoutManager(requireContext())
+            rvSchedule.adapter = studentScheduleAdapter
         }
     }
 
-    private fun setUpToolbar() {
-        binding.toolbar.toolbarBack.isVisible = false
+    private fun setUpProfessorRecycler() {
+        binding.apply {
+            teacherScheduleAdapter = TeacherScheduleAdapter()
+            rvSchedule.layoutManager = LinearLayoutManager(requireContext())
+            rvSchedule.adapter = teacherScheduleAdapter
+        }
+    }
+
+    private fun setUpToolbar() = with(binding){
+        toolbar.toolbarBack.isVisible = false
+        viewModel.weekNumber.observe(viewLifecycleOwner){
+            toolbar.toolbarWeek.text = it
+        }
     }
 
     private fun setUpDialog() {
@@ -66,7 +75,7 @@ class ScheduleFragment : Fragment() {
         val spinnerGroupAdapter = ArrayAdapter(
             requireContext(),
             androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
-            groupsList
+            getGroups()
         )
         val spinnerSubgroupAdapter = ArrayAdapter(
             requireContext(),
@@ -113,62 +122,37 @@ class ScheduleFragment : Fragment() {
         }
     }
 
-    private fun getGroups(){
-        val groupsResponse = ScheduleApi().getGroups()
-        groupsResponse.enqueue(object : Callback<Groups> {
-            override fun onResponse(
-                call: Call<Groups>,
-                response: Response<Groups>
-            ) {
-                Log.d("ScheduleFragment", response.body().toString())
-                for(i in response.body()?.data!!){
-                    groupsList.add(i.name)
-                }
+    private fun getGroups(): MutableList<String>{
+        val groupsList = mutableListOf<String>()
+        viewModel.groups.observe(viewLifecycleOwner) {
+            for (i in it.data) {
+                groupsList.add(i.name)
             }
-
-            override fun onFailure(call: Call<Groups>, t: Throwable) {
-                Log.d("ScheduleFragment", t.message.toString())
-            }
-
-        })
+        }
+        return groupsList
     }
 
     private fun getStudentSchedule(group: String, subgroup: String) {
+        setUpStudentRecycler()
         val params = mutableMapOf<String, String>()
         params["group"] = group
         params["subgroup"] = subgroup
         params["weekdays[]"] = "1"
-
-        val scheduleList = ScheduleApi().getSchedule(params)
-        studentScheduleAdapter = StudentScheduleAdapter()
-        scheduleList.enqueue(object : Callback<ScheduleData> {
-
-            override fun onResponse(call: Call<ScheduleData>, response: Response<ScheduleData>) {
-                studentScheduleAdapter.differ.submitList(response.body()?.data?.schedule)
-                binding.rvSchedule.adapter = studentScheduleAdapter
-            }
-
-            override fun onFailure(call: Call<ScheduleData>, t: Throwable) {
-                Log.d("ScheduleFragment", scheduleList.request().url().toString())
-            }
-        })
+        viewModel.getStudentSchedule(params)
+        viewModel.studentSchedule.observe(viewLifecycleOwner) {
+            studentScheduleAdapter.differ.submitList(it.data.schedule)
+        }
 
     }
 
     private fun getProfessorSchedule(name: String) {
+        setUpProfessorRecycler()
         val params = mutableMapOf<String, String>()
-        params.put("teacher", name)
-        params.put("weekdays[]", "1")
-        teacherScheduleAdapter = TeacherScheduleAdapter()
-        CoroutineScope(Dispatchers.Main).launch{
-            val professorSchedule = ScheduleApi().getProfessorSchedule(params)
-
-            if(professorSchedule.isSuccessful){
-                teacherScheduleAdapter.differ.submitList(professorSchedule.body()?.data?.schedule)
-                binding.rvSchedule.adapter = teacherScheduleAdapter
-            }else{
-                Log.d("errorTAG", professorSchedule.raw().request().url().toString())
-            }
+        params["teacher"] = name
+        params["weekdays[]"] = "1"
+        viewModel.getProfessorSchedule(params)
+        viewModel.professorSchedule.observe(viewLifecycleOwner){
+            teacherScheduleAdapter.differ.submitList(it.data.schedule)
         }
 
     }
