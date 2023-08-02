@@ -1,24 +1,22 @@
-package com.yxl.schedule.network
+package com.yxl.schedule.data
 
 import com.yxl.schedule.consts.BackendUrls
-import com.yxl.schedule.models.Groups
-import com.yxl.schedule.models.ScheduleData
-import com.yxl.schedule.models.TeacherData
-import retrofit2.Call
+import com.yxl.schedule.model.Groups
+import com.yxl.schedule.model.ScheduleData
+import com.yxl.schedule.model.TeacherData
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Headers
-import retrofit2.http.Path
 import retrofit2.http.QueryMap
 
 interface ScheduleApi {
     @Headers("Content-Type: application/json", "Accept: application/json")
     @GET("group")
-     fun getSchedule(
+    suspend fun getStudentSchedule(
         @QueryMap options: MutableMap<String, String>
-    ): Call<ScheduleData>
+    ): Response<ScheduleData>
 
     @Headers("Content-Type: application/json", "Accept: application/json")
     @GET("teacher")
@@ -28,7 +26,7 @@ interface ScheduleApi {
 
     @Headers("Content-Type: application/json", "Accept: application/json")
     @GET("group/list")
-    fun getGroups(): Call<Groups>
+    suspend fun getGroups(): Response<Groups>
 
     companion object{
 
