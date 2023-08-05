@@ -9,7 +9,7 @@ data class ScheduleData(
 ) {
     data class Data(
         @SerializedName("schedule")
-        val schedule: List<Schedule>,
+        val schedule: List<Schedule>? = null,
         @SerializedName("group")
         val group: Group
     ) {

@@ -9,19 +9,22 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Headers
-import retrofit2.http.QueryMap
+import retrofit2.http.Query
 
 interface ScheduleApi {
     @Headers("Content-Type: application/json", "Accept: application/json")
     @GET("group")
     suspend fun getStudentSchedule(
-        @QueryMap options: MutableMap<String, String>
+        @Query("group") group: String,
+        @Query("subgroup") subgroup: String,
+        @Query("weekdays[]") weekdays: String
     ): Response<ScheduleData>
 
     @Headers("Content-Type: application/json", "Accept: application/json")
     @GET("teacher")
     suspend fun getProfessorSchedule(
-        @QueryMap options: MutableMap<String, String>
+        @Query("teacher") teacher: String,
+        @Query("weekdays[]") weekdays: String
     ): Response<TeacherData>
 
     @Headers("Content-Type: application/json", "Accept: application/json")

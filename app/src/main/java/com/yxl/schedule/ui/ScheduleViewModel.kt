@@ -17,20 +17,20 @@ class ScheduleViewModel(
     val studentSchedule: MutableLiveData<ScheduleData> = MutableLiveData()
     val professorSchedule: MutableLiveData<TeacherData> = MutableLiveData()
     val groups: MutableLiveData<Groups> = MutableLiveData()
-    val weekNumber = MutableLiveData<String>()
+    val weekNumber = MutableLiveData<Int>()
 
     init {
         getGroups()
-        weekNumber.value = "1 неделя"
+        weekNumber.value = 1
     }
 
-    fun getStudentSchedule(options: MutableMap<String, String>) = viewModelScope.launch {
-        val response = repository.getStudentSchedule(options)
+    fun getStudentSchedule(group: String, subgroup: String, weekdays: String) = viewModelScope.launch {
+        val response = repository.getStudentSchedule(group, subgroup, weekdays)
         studentSchedule.postValue(response.body())
     }
 
-    fun getProfessorSchedule(options: MutableMap<String, String>) = viewModelScope.launch {
-        professorSchedule.postValue(repository.getProfessorSchedule(options).body())
+    fun getProfessorSchedule(teacher: String, weekdays: String) = viewModelScope.launch {
+        professorSchedule.postValue(repository.getProfessorSchedule(teacher, weekdays).body())
     }
 
     private fun getGroups() = viewModelScope.launch {

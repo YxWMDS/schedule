@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yxl.schedule.databinding.ScheduleItemBinding
 import com.yxl.schedule.model.ScheduleData
 
-class StudentScheduleAdapter() : RecyclerView.Adapter<StudentScheduleAdapter.ViewHolder>() {
+class StudentScheduleAdapter : RecyclerView.Adapter<StudentScheduleAdapter.ViewHolder>() {
 
-    class ViewHolder(val binding: ScheduleItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private val binding: ScheduleItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(schedule: ScheduleData.Data.Schedule) = with(binding){
             tvSubName.text = schedule.subject.abbreviated

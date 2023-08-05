@@ -1,7 +1,6 @@
 package com.yxl.schedule.ui
 
 import android.app.AlertDialog
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -11,28 +10,29 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.yxl.schedule.adapters.StudentScheduleAdapter
-import com.yxl.schedule.adapters.TeacherScheduleAdapter
+import com.yxl.schedule.adapters.ParentProfessorScheduleAdapter
+import com.yxl.schedule.adapters.ParentStudentScheduleAdapter
 import com.yxl.schedule.data.ScheduleRepository
 import com.yxl.schedule.databinding.DialogSearchBinding
 import com.yxl.schedule.databinding.FragmentScheduleBinding
+import com.yxl.schedule.model.ProfessorDayData
+import com.yxl.schedule.model.StudentDayData
 
 
 class ScheduleFragment : Fragment() {
 
     private lateinit var binding: FragmentScheduleBinding
-    private lateinit var studentScheduleAdapter: StudentScheduleAdapter
-    private lateinit var teacherScheduleAdapter: TeacherScheduleAdapter
+    private lateinit var parentStudentAdapter: ParentStudentScheduleAdapter
+    private lateinit var parentProfessorAdapter: ParentProfessorScheduleAdapter
     private val viewModel: ScheduleViewModel by activityViewModels{ viewModelProvider }
     private val repository = ScheduleRepository()
     private val viewModelProvider = ScheduleViewModelProvider(repository)
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentScheduleBinding.inflate(layoutInflater, container, false)
         Log.d("ViewModel", viewModel.toString())
+        getGroups()
         return binding.root
     }
 
@@ -40,8 +40,6 @@ class ScheduleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpToolbar()
         binding.rvSchedule.layoutManager = LinearLayoutManager(requireContext())
-
-        getGroups()
         binding.fabSearchGroup.setOnClickListener {
             setUpDialog()
         }
@@ -49,24 +47,21 @@ class ScheduleFragment : Fragment() {
 
     private fun setUpStudentRecycler() {
         binding.apply {
-            studentScheduleAdapter = StudentScheduleAdapter()
             rvSchedule.layoutManager = LinearLayoutManager(requireContext())
-            rvSchedule.adapter = studentScheduleAdapter
+
         }
     }
 
     private fun setUpProfessorRecycler() {
         binding.apply {
-            teacherScheduleAdapter = TeacherScheduleAdapter()
             rvSchedule.layoutManager = LinearLayoutManager(requireContext())
-            rvSchedule.adapter = teacherScheduleAdapter
         }
     }
 
     private fun setUpToolbar() = with(binding){
         toolbar.toolbarBack.isVisible = false
         viewModel.weekNumber.observe(viewLifecycleOwner){
-            toolbar.toolbarWeek.text = it
+            toolbar.toolbarWeek.text = "$it Неделя"
         }
     }
 
@@ -132,32 +127,58 @@ class ScheduleFragment : Fragment() {
         return groupsList
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun getStudentSchedule(group: String, subgroup: String) {
         setUpStudentRecycler()
-        val params = mutableMapOf<String, String>()
-        params["group"] = group
-        params["subgroup"] = subgroup
-        params["weekdays[]"] = "1"
-        viewModel.getStudentSchedule(params)
-        viewModel.studentSchedule.observe(viewLifecycleOwner) {
-            studentScheduleAdapter.differ.submitList(it.data.schedule)
-        }
+        val daysList = getWeekSchedule(STUDENT_CODE, group, subgroup) as List<StudentDayData>
+        parentStudentAdapter = ParentStudentScheduleAdapter(daysList)
+        parentStudentAdapter.differ.submitList(daysList)
+        binding.rvSchedule.adapter = parentStudentAdapter
 
     }
 
-    private fun getProfessorSchedule(name: String) {
+    @Suppress("UNCHECKED_CAST")
+    private fun getProfessorSchedule(teacher: String) {
         setUpProfessorRecycler()
-        val params = mutableMapOf<String, String>()
-        params["teacher"] = name
-        params["weekdays[]"] = "1"
-        viewModel.getProfessorSchedule(params)
-        viewModel.professorSchedule.observe(viewLifecycleOwner){
-            teacherScheduleAdapter.differ.submitList(it.data.schedule)
-        }
+        val daysList = getWeekSchedule(code = PROFESSOR_CODE, teacher = teacher) as List<ProfessorDayData>
+        parentProfessorAdapter = ParentProfessorScheduleAdapter(daysList)
+        parentProfessorAdapter.differ.submitList(daysList)
+        binding.rvSchedule.adapter = parentProfessorAdapter
 
+    }
+
+    private fun getWeekSchedule(
+        code: String, group: String = "", subgroup: String = "", teacher: String = ""
+    ): List<Any>{
+        val days = listOf("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота")
+        val daysList = mutableListOf<Any>()
+
+        when (code) {
+            STUDENT_CODE -> {
+                for(i in days.indices){
+                    viewModel.getStudentSchedule(group, subgroup, "${i+1}")
+                    Log.d("list", viewModel.studentSchedule.value?.data?.schedule.toString())
+                    daysList.add(StudentDayData(days[i],
+                        viewModel.studentSchedule.value?.data?.schedule!!
+                    ))
+                }
+            }
+            PROFESSOR_CODE -> {
+                for(i in days.indices){
+                    viewModel.getProfessorSchedule(teacher, "${i+1}")
+                    viewModel.professorSchedule.observe(viewLifecycleOwner){
+                        daysList.add(ProfessorDayData(days[i], it.data.schedule))
+                    }
+                }
+            }
+        }
+        Log.d("list", daysList.toString())
+        return daysList
     }
 
     companion object {
+        private const val STUDENT_CODE = "student"
+        private const val PROFESSOR_CODE = "professor"
         @JvmStatic
         fun newInstance() =
             ScheduleFragment()
