@@ -9,7 +9,7 @@ data class TeacherData(
 ) {
     data class Data(
         @SerializedName("schedule")
-        val schedule: List<Schedule>
+        val schedule: List<Schedule>? = null
     ) {
         data class Schedule(
             @SerializedName("id")

@@ -2,11 +2,11 @@ package com.yxl.schedule.data
 
 class ScheduleRepository {
 
-    suspend fun getStudentSchedule(options: MutableMap<String, String>)
-        = ScheduleApi().getStudentSchedule(options)
+    suspend fun getStudentSchedule(group: String, subgroup: String, weekdays: String)
+        = ScheduleApi().getStudentSchedule(group, subgroup, weekdays)
 
-    suspend fun getProfessorSchedule(options: MutableMap<String, String>)
-            = ScheduleApi().getProfessorSchedule(options)
+    suspend fun getProfessorSchedule(teacher: String, weekdays: String)
+            = ScheduleApi().getProfessorSchedule(teacher, weekdays)
 
     suspend fun getGroups()
             = ScheduleApi().getGroups()
