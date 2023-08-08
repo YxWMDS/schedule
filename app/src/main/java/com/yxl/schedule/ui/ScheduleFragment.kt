@@ -13,11 +13,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yxl.schedule.adapters.ParentProfessorScheduleAdapter
 import com.yxl.schedule.adapters.ParentStudentScheduleAdapter
+import com.yxl.schedule.data.ScheduleApi
 import com.yxl.schedule.data.ScheduleRepository
 import com.yxl.schedule.databinding.DialogSearchBinding
 import com.yxl.schedule.databinding.FragmentScheduleBinding
 import com.yxl.schedule.model.ProfessorDayData
+import com.yxl.schedule.model.ScheduleData
 import com.yxl.schedule.model.StudentDayData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Response
 
 
 class ScheduleFragment : Fragment() {
@@ -130,10 +136,22 @@ class ScheduleFragment : Fragment() {
     @Suppress("UNCHECKED_CAST")
     private fun getStudentSchedule(group: String, subgroup: String) {
         setUpStudentRecycler()
-        val daysList = getWeekSchedule(STUDENT_CODE, group, subgroup) as List<StudentDayData>
-        parentStudentAdapter = ParentStudentScheduleAdapter(daysList)
-        parentStudentAdapter.differ.submitList(daysList)
-        binding.rvSchedule.adapter = parentStudentAdapter
+        val dayNames = listOf("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота")
+        val days = mutableListOf<StudentDayData>()
+        CoroutineScope(Dispatchers.Main).launch {
+            for(i in 0..5){
+                val day = ScheduleApi().getStudentSchedule(group, subgroup,"${i+1}").body()
+                Log.d("listttt", day.toString())
+                days.add(StudentDayData(dayNames[i], day?.data?.schedule))
+            }
+//            val daysList = getWeekSchedule(STUDENT_CODE, group, subgroup) as List<StudentDayData>
+            parentStudentAdapter = ParentStudentScheduleAdapter(days)
+            parentStudentAdapter.differ.submitList(days)
+            binding.rvSchedule.adapter = parentStudentAdapter
+        }
+
+
+
 
     }
 
@@ -157,10 +175,11 @@ class ScheduleFragment : Fragment() {
             STUDENT_CODE -> {
                 for(i in days.indices){
                     viewModel.getStudentSchedule(group, subgroup, "${i+1}")
-                    Log.d("list", viewModel.studentSchedule.value?.data?.schedule.toString())
-                    daysList.add(StudentDayData(days[i],
-                        viewModel.studentSchedule.value?.data?.schedule!!
-                    ))
+
+                    viewModel.studentSchedule.observe(viewLifecycleOwner){
+                        Log.d("list", it.data.schedule.toString())
+                        daysList.add(StudentDayData(days[i], it.data.schedule))
+                    }
                 }
             }
             PROFESSOR_CODE -> {
