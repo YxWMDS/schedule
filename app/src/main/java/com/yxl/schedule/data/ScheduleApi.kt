@@ -1,6 +1,6 @@
 package com.yxl.schedule.data
 
-import com.yxl.schedule.consts.BackendUrls
+import com.yxl.schedule.utils.Constants
 import com.yxl.schedule.model.Groups
 import com.yxl.schedule.model.ScheduleData
 import com.yxl.schedule.model.TeacherData
@@ -35,7 +35,7 @@ interface ScheduleApi {
 
          operator fun invoke(): ScheduleApi {
            return Retrofit.Builder()
-                .baseUrl(BackendUrls.scheduleBaseUrl)
+                .baseUrl(Constants.scheduleBaseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(ScheduleApi::class.java)

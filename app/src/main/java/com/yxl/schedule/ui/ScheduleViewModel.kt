@@ -1,40 +1,56 @@
 package com.yxl.schedule.ui
 
-import androidx.lifecycle.LiveData
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yxl.schedule.data.ScheduleRepository
-import com.yxl.schedule.model.Groups
-import com.yxl.schedule.model.ScheduleData
-import com.yxl.schedule.model.TeacherData
+import com.yxl.schedule.model.ProfessorDayData
+import com.yxl.schedule.model.StudentDayData
+import com.yxl.schedule.utils.Constants
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ScheduleViewModel(
     private val repository: ScheduleRepository
 ): ViewModel() {
 
-    val studentSchedule: MutableLiveData<ScheduleData> = MutableLiveData()
-    val professorSchedule: MutableLiveData<TeacherData> = MutableLiveData()
-    val groups: MutableLiveData<Groups> = MutableLiveData()
+    val studentSchedule: MutableLiveData<List<StudentDayData>> = MutableLiveData()
+    val professorSchedule: MutableLiveData<List<ProfessorDayData>> = MutableLiveData()
+    val groups: MutableLiveData<List<String>> = MutableLiveData()
     val weekNumber = MutableLiveData<Int>()
 
     init {
         getGroups()
-        weekNumber.value = 1
-    }
-
-    fun getStudentSchedule(group: String, subgroup: String, weekdays: String) = viewModelScope.launch {
-        val response = repository.getStudentSchedule(group, subgroup, weekdays)
-        studentSchedule.postValue(response.body())
-    }
-
-    fun getProfessorSchedule(teacher: String, weekdays: String) = viewModelScope.launch {
-        professorSchedule.postValue(repository.getProfessorSchedule(teacher, weekdays).body())
+        weekNumber.value = Constants.weekOfMonth
     }
 
     private fun getGroups() = viewModelScope.launch {
-        val response = repository.getGroups()
-        groups.postValue(response.body())
+        val response = repository.getGroups().body()
+        val list = mutableListOf<String>()
+        for(i in response?.data!!){
+            list.add(i.name)
+        }
+        groups.postValue(list)
     }
+
+    fun getStudentScheduleWeek(group: String, subgroup: String) = viewModelScope.launch{
+        val list = mutableListOf<StudentDayData>()
+        for(i in Constants.dayNames.indices){
+            list.add(StudentDayData(Constants.dayNames[i], repository.getStudentSchedule(group, subgroup, "${i+1}").body()?.data?.schedule))
+        }
+        studentSchedule.postValue(list)
+        Log.d("LISTVIEWMODEL", list.toString())
+    }
+
+    fun getProfessorScheduleWeek(teacher: String) = viewModelScope.launch {
+        val list = mutableListOf<ProfessorDayData>()
+        for(i in Constants.dayNames.indices){
+            list.add(ProfessorDayData(Constants.dayNames[i], repository.getProfessorSchedule(teacher, "${i+1}").body()?.data?.schedule))
+        }
+        professorSchedule.postValue(list)
+        Log.d("LISTVIEWMODEL", list.toString())
+    }
+
 }
