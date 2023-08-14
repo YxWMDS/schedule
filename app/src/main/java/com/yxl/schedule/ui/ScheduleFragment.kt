@@ -31,7 +31,6 @@ class ScheduleFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentScheduleBinding.inflate(layoutInflater, container, false)
         Log.d("ViewModel", viewModel.toString())
-        getGroups()
         return binding.root
     }
 
@@ -41,18 +40,10 @@ class ScheduleFragment : Fragment() {
         binding.rvSchedule.layoutManager = LinearLayoutManager(requireContext())
         binding.fabSearchGroup.setOnClickListener {
             (activity as ScheduleActivity).openSearchDialog()
-            setUpDialog()
         }
         Log.d("ViewModel", viewModel.studentSchedule.value.toString())
         getStudentSchedule()
         getProfessorSchedule()
-    }
-
-    private fun setUpStudentRecycler() {
-        binding.apply {
-            rvSchedule.layoutManager = LinearLayoutManager(requireContext())
-
-        }
     }
 
     private fun setUpRecycler() {
@@ -82,12 +73,12 @@ class ScheduleFragment : Fragment() {
     private fun getProfessorSchedule() {
         setUpRecycler()
 
-        viewModel.professorSchedule.observe(viewLifecycleOwner){
+        viewModel.professorSchedule.observe(viewLifecycleOwner) {
             parentProfessorAdapter = ParentProfessorScheduleAdapter(it)
             parentProfessorAdapter.differ.submitList(it)
             binding.rvSchedule.adapter = parentProfessorAdapter
         }
-
+    }
     companion object {
 //        private const val STUDENT_CODE = "student"
 //        private const val PROFESSOR_CODE = "professor"
