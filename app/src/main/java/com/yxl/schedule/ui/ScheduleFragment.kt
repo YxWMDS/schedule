@@ -1,5 +1,6 @@
 package com.yxl.schedule.ui
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import com.yxl.schedule.adapters.ParentStudentScheduleAdapter
 import com.yxl.schedule.data.ScheduleRepository
 import com.yxl.schedule.databinding.FragmentScheduleBinding
 import com.yxl.schedule.model.ProfessorDayData
+import com.yxl.schedule.model.StudentDayData
 
 
 class ScheduleFragment : Fragment() {
@@ -29,6 +31,7 @@ class ScheduleFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentScheduleBinding.inflate(layoutInflater, container, false)
         Log.d("ViewModel", viewModel.toString())
+        getGroups()
         return binding.root
     }
 
@@ -38,10 +41,18 @@ class ScheduleFragment : Fragment() {
         binding.rvSchedule.layoutManager = LinearLayoutManager(requireContext())
         binding.fabSearchGroup.setOnClickListener {
             (activity as ScheduleActivity).openSearchDialog()
+            setUpDialog()
         }
         Log.d("ViewModel", viewModel.studentSchedule.value.toString())
         getStudentSchedule()
         getProfessorSchedule()
+    }
+
+    private fun setUpStudentRecycler() {
+        binding.apply {
+            rvSchedule.layoutManager = LinearLayoutManager(requireContext())
+
+        }
     }
 
     private fun setUpRecycler() {
@@ -77,11 +88,10 @@ class ScheduleFragment : Fragment() {
             binding.rvSchedule.adapter = parentProfessorAdapter
         }
 
-    }
-
     companion object {
 //        private const val STUDENT_CODE = "student"
 //        private const val PROFESSOR_CODE = "professor"
+      
         @JvmStatic
         fun newInstance() =
             ScheduleFragment()

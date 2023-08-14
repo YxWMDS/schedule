@@ -42,6 +42,7 @@ class ScheduleViewModel(
         }
         studentSchedule.postValue(list)
         Log.d("LISTVIEWMODEL", list.toString())
+        weekNumber.value = 1
     }
 
     fun getProfessorScheduleWeek(teacher: String) = viewModelScope.launch {
