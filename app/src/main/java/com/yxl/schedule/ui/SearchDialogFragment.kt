@@ -8,23 +8,21 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.R
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.yxl.schedule.ScheduleActivity
-import com.yxl.schedule.data.ScheduleRepository
 import com.yxl.schedule.databinding.DialogSearchBinding
 import com.yxl.schedule.utils.Constants
 
 class SearchDialogFragment: Fragment() {
 
     private lateinit var binding: DialogSearchBinding
-    private val viewModel: ScheduleViewModel by activityViewModels{ viewModelProvider }
-    private val repository = ScheduleRepository()
-    private val viewModelProvider = ScheduleViewModelProvider(repository)
+    private val viewModel: ScheduleViewModel by activityViewModels()
+//    private val repository = ScheduleRepository()
+//    private val viewModelProvider = ScheduleViewModelProvider(repository)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DialogSearchBinding.inflate(inflater, container, false)
         return binding.root
     }

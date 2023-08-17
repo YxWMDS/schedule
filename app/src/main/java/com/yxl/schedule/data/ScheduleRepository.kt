@@ -1,6 +1,10 @@
 package com.yxl.schedule.data
 
-class ScheduleRepository {
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class ScheduleRepository @Inject constructor() {
 
     suspend fun getStudentSchedule(group: String, subgroup: String, weekdays: String)
         = ScheduleApi().getStudentSchedule(group, subgroup, weekdays)

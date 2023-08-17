@@ -3,7 +3,7 @@ package com.yxl.schedule.model
 
 import com.google.gson.annotations.SerializedName
 
-data class TeacherData(
+data class ProfessorData(
     @SerializedName("data")
     val data: Data
 ) {
