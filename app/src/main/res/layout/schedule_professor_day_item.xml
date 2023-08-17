@@ -20,13 +20,14 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            tools:ignore="HardcodedText" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSubjects"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/schedule_teacher_item"
+            tools:listitem="@layout/schedule_professor_item"
             tools:itemCount="4"/>
 
     </LinearLayout>

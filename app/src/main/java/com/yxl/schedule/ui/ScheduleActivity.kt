@@ -1,11 +1,12 @@
-package com.yxl.schedule
+package com.yxl.schedule.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.yxl.schedule.R
 import com.yxl.schedule.databinding.ActivityMainBinding
-import com.yxl.schedule.ui.ScheduleFragment
-import com.yxl.schedule.ui.SearchDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ScheduleActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {

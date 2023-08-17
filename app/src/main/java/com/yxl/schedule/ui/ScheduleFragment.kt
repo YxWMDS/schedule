@@ -1,6 +1,5 @@
 package com.yxl.schedule.ui
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,23 +9,19 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.yxl.schedule.ScheduleActivity
 import com.yxl.schedule.adapters.ParentProfessorScheduleAdapter
 import com.yxl.schedule.adapters.ParentStudentScheduleAdapter
-import com.yxl.schedule.data.ScheduleRepository
 import com.yxl.schedule.databinding.FragmentScheduleBinding
-import com.yxl.schedule.model.ProfessorDayData
-import com.yxl.schedule.model.StudentDayData
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class ScheduleFragment : Fragment() {
 
     private lateinit var binding: FragmentScheduleBinding
     private lateinit var parentStudentAdapter: ParentStudentScheduleAdapter
     private lateinit var parentProfessorAdapter: ParentProfessorScheduleAdapter
-    private val viewModel: ScheduleViewModel by activityViewModels{ viewModelProvider }
-    private val repository = ScheduleRepository()
-    private val viewModelProvider = ScheduleViewModelProvider(repository)
+    private val viewModel: ScheduleViewModel by activityViewModels()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentScheduleBinding.inflate(layoutInflater, container, false)
@@ -54,6 +49,7 @@ class ScheduleFragment : Fragment() {
 
     private fun setUpToolbar() = with(binding){
         toolbar.toolbarBack.isVisible = false
+        toolbar.toolbarRefresh.setOnClickListener { getStudentSchedule() }
         viewModel.weekNumber.observe(viewLifecycleOwner){
             toolbar.toolbarWeek.text = "$it Неделя"
         }
@@ -61,7 +57,6 @@ class ScheduleFragment : Fragment() {
 
     private fun getStudentSchedule() {
         setUpRecycler()
-
         viewModel.studentSchedule.observe(viewLifecycleOwner){
             parentStudentAdapter = ParentStudentScheduleAdapter(it)
             parentStudentAdapter.differ.submitList(it)
