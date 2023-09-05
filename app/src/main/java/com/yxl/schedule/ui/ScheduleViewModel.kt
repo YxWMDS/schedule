@@ -1,74 +1,111 @@
 package com.yxl.schedule.ui
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yxl.schedule.data.GroupRepository
 import com.yxl.schedule.data.ScheduleRepository
-import com.yxl.schedule.model.ProfessorDayData
-import com.yxl.schedule.model.StudentDayData
+import com.yxl.schedule.db.entity.GroupEntity
+import com.yxl.schedule.db.entity.ScheduleEntity
+import com.yxl.schedule.data.model.ProfessorDayData
+import com.yxl.schedule.data.model.StudentDayData
 import com.yxl.schedule.prefs.SchedulePreferences
 import com.yxl.schedule.utils.Constants
+import com.yxl.schedule.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
-    private val repository: ScheduleRepository,
-    private val preferences: SchedulePreferences
+    private val scheduleRepository: ScheduleRepository,
+    private val preferences: SchedulePreferences,
+    private val groupRepository: GroupRepository
 ): ViewModel() {
+
     val studentSchedule: MutableLiveData<List<StudentDayData>> = MutableLiveData()
     val professorSchedule: MutableLiveData<List<ProfessorDayData>> = MutableLiveData()
     val groups: MutableLiveData<List<String>> = MutableLiveData()
-    val weekNumber = MutableLiveData<Int>()
+    var weekNumber = MutableLiveData(DateUtils.weekOfMonth)
+    val isLoading = MutableLiveData(false)
+    val isGroupsLoaded = MutableLiveData(false)
     init {
         getGroups()
-        weekNumber.value = if(Constants.weekOfMonth == 1){
-            4
-        }else{
-            Constants.weekOfMonth - 1
-        }
         tryGetStSchedule()
-
     }
 
     private fun getGroups() = viewModelScope.launch {
-        val response = repository.getGroups().body()
+        val response = scheduleRepository.getGroups().body()
         val list = mutableListOf<String>()
-        for(i in response?.data!!){
+        for (i in response?.data!!) {
             list.add(i.name)
+            groupRepository.insert(GroupEntity(i.name))
         }
         groups.postValue(list)
+        isGroupsLoaded.postValue(true)
     }
 
+    private fun getGroupsFromDb() = viewModelScope.launch {
+        val res = mutableListOf<String>()
+        if(groupRepository.getGroups().isNotEmpty()){
+            val list = groupRepository.getGroups()
+            for(i in list){
+                res.add(i.name)
+            }
+        }
+        groups.postValue(res)
+    }
+
+//    fun setWeekNumber(week: Int) = viewModelScope.launch{
+//        weekNumber.emit(week)
+//    }
+
     fun getStudentScheduleWeek(group: String, subgroup: String) = viewModelScope.launch{
+        isLoading.value = true
         val list = mutableListOf<StudentDayData>()
         for(i in Constants.dayNames.indices){
-            list.add(StudentDayData(Constants.dayNames[i], repository.getStudentSchedule(group, subgroup, "${i+1}").body()?.data?.schedule))
+            list.add(StudentDayData(Constants.dayNames[i], scheduleRepository.getStudentSchedule(group, subgroup, "${i+1}", weekNumber.value.toString()).body()?.data?.schedule))
         }
+
         studentSchedule.postValue(list)
         preferences.setGroup(group)
         preferences.setSubgroup(subgroup)
-        preferences.setWeekNumber(weekNumber.value.toString())
+        preferences.setWeekNumber(weekNumber.toString())
+        isLoading.value = false
     }
 
-    fun getProfessorScheduleWeek(teacher: String) = viewModelScope.launch {
+    private fun addToDb(schedule: ScheduleEntity) = viewModelScope.launch {
+        scheduleRepository.insertScheduleDb(schedule)
+    }
+
+    fun getProfessorScheduleWeek(teacher: String?) = viewModelScope.launch {
         val list = mutableListOf<ProfessorDayData>()
-        for(i in Constants.dayNames.indices){
-            list.add(ProfessorDayData(Constants.dayNames[i], repository.getProfessorSchedule(teacher, "${i+1}").body()?.data?.schedule))
+        if(!teacher.isNullOrEmpty()){
+            for(i in Constants.dayNames.indices){
+                list.add(ProfessorDayData(Constants.dayNames[i], scheduleRepository.getProfessorSchedule(teacher, "${i+1}").body()?.data?.schedule))
+            }
         }
         professorSchedule.postValue(list)
-        Log.d("LISTVIEWMODEL", list.toString())
     }
 
     private fun tryGetStSchedule() = viewModelScope.launch{
         if(preferences.getGroup.firstOrNull() != null && preferences.getSubgroup.firstOrNull() != null){
-            getStudentScheduleWeek(preferences.getGroup.first()!!, preferences.getSubgroup.first()!!)
+            getStudentScheduleWeek(
+                preferences.getGroup.first()!!,
+                preferences.getSubgroup.first()!!
+            )
         }
     }
+
+    fun onWeekChanged() = viewModelScope.launch{
+        getStudentScheduleWeek(
+            preferences.getGroup.first()!!,
+            preferences.getSubgroup.first()!!
+        )
+    }
+
+
 
 }

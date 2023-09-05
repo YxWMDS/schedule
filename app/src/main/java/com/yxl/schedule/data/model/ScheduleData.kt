@@ -1,15 +1,17 @@
-package com.yxl.schedule.model
+package com.yxl.schedule.data.model
 
 
 import com.google.gson.annotations.SerializedName
 
-data class ProfessorData(
+data class ScheduleData(
     @SerializedName("data")
     val data: Data
 ) {
     data class Data(
         @SerializedName("schedule")
-        val schedule: List<Schedule>? = null
+        val schedule: List<Schedule>? = null,
+        @SerializedName("group")
+        val group: Group
     ) {
         data class Schedule(
             @SerializedName("id")
@@ -19,19 +21,19 @@ data class ProfessorData(
             @SerializedName("type")
             val type: Type,
             @SerializedName("auditory")
-            val auditory: String,
+            val auditory: Int,
             @SerializedName("building")
             val building: String,
             @SerializedName("weeks")
             val weeks: String,
             @SerializedName("subgroup")
-            val subgroup: Any,
+            val subgroup: Int,
             @SerializedName("time")
             val time: Time,
             @SerializedName("weekday")
             val weekday: Weekday,
-            @SerializedName("group")
-            val group: Group
+            @SerializedName("teacher")
+            val teacher: Teacher
         ) {
             data class Subject(
                 @SerializedName("abbreviated")
@@ -63,28 +65,44 @@ data class ProfessorData(
                 val name: String
             )
 
-            data class Group(
+            data class Teacher(
                 @SerializedName("id")
                 val id: Int,
-                @SerializedName("name")
-                val name: String,
-                @SerializedName("type")
-                val type: Type
+                @SerializedName("fullName")
+                val fullName: String,
+                @SerializedName("department")
+                val department: Any,
+                @SerializedName("position")
+                val position: Any
+            )
+        }
+
+        data class Group(
+            @SerializedName("id")
+            val id: Int,
+            @SerializedName("name")
+            val name: String,
+            @SerializedName("type")
+            val type: Type
+        ) {
+            data class Type(
+                @SerializedName("names")
+                val names: Names,
+                @SerializedName("timeType")
+                val timeType: String
             ) {
-                data class Type(
-                    @SerializedName("names")
-                    val names: Names,
-                    @SerializedName("timeType")
-                    val timeType: String
-                ) {
-                    data class Names(
-                        @SerializedName("abbreviated")
-                        val abbreviated: String,
-                        @SerializedName("full")
-                        val full: String
-                    )
-                }
+                data class Names(
+                    @SerializedName("abbreviated")
+                    val abbreviated: String,
+                    @SerializedName("full")
+                    val full: String
+                )
             }
         }
     }
 }
+
+data class Groups(
+    @SerializedName("data")
+    val data: List<ScheduleData.Data.Group>
+)

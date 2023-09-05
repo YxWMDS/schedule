@@ -5,18 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.R
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.yxl.schedule.databinding.DialogSearchBinding
 import com.yxl.schedule.utils.Constants
+import java.util.Locale
 
 class SearchDialogFragment: Fragment() {
 
     private lateinit var binding: DialogSearchBinding
     private val viewModel: ScheduleViewModel by activityViewModels()
-//    private val repository = ScheduleRepository()
-//    private val viewModelProvider = ScheduleViewModelProvider(repository)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,7 +62,15 @@ class SearchDialogFragment: Fragment() {
             bConfirm.setOnClickListener {
                 if (sProfessor.isChecked) {
                     viewModel.getProfessorScheduleWeek(
-                        etProf.text.toString()
+                        if (etProf.text.isNotEmpty()){
+                            etProf.text.toString().lowercase()
+                                .replaceFirstChar {
+                                    if (it.isLowerCase()) it.titlecase(Locale.ROOT)
+                                    else it.toString()
+                                }
+                        }else{
+                            null
+                        }
                     )
                 } else {
                     viewModel.getStudentScheduleWeek(
@@ -73,6 +81,8 @@ class SearchDialogFragment: Fragment() {
                 activity?.onBackPressedDispatcher?.onBackPressed()
             }
         }
+
+        binding.ivClose.setOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
     }
 
     companion object {

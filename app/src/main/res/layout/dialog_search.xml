@@ -3,10 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/dialog_shape"
-    android:backgroundTint="@color/light_gray"
     android:layout_gravity="center"
-    app:cardCornerRadius="8dp"
+    style="@style/Theme.Dialog"
+    app:cardCornerRadius="16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="10dp"
@@ -19,12 +18,24 @@
     android:paddingTop="8dp"
     android:paddingBottom="16dp">
 
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_close"
+            android:clickable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/sProfessor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Преподаватель"
+            android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,7 +85,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinnerGroups" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/bConfirm"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -82,6 +93,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="32dp"
             android:text="ok"
+            app:cornerRadius="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -95,7 +107,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:hint="Введите свою фамилию"
+            android:hint="Фамилия"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinnerSubgroups"

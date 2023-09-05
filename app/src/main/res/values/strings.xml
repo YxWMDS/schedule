@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">schedule</string>
+    <string name="app_name">Расписание</string>
     <string name="schedule_string">Расписание</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

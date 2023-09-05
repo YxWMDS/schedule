@@ -31,11 +31,7 @@ class ScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpToolbar()
         binding.rvSchedule.layoutManager = LinearLayoutManager(requireContext())
-        binding.fabSearchGroup.setOnClickListener {
-            (activity as ScheduleActivity).openSearchDialog()
-        }
         Log.d("ViewModel", viewModel.studentSchedule.value.toString())
         getStudentSchedule()
         getProfessorSchedule()
@@ -47,16 +43,20 @@ class ScheduleFragment : Fragment() {
         }
     }
 
-    private fun setUpToolbar() = with(binding){
-        toolbar.toolbarBack.isVisible = false
-        toolbar.toolbarRefresh.setOnClickListener { getStudentSchedule() }
-        viewModel.weekNumber.observe(viewLifecycleOwner){
-            toolbar.toolbarWeek.text = "$it Неделя"
-        }
-    }
-
     private fun getStudentSchedule() {
         setUpRecycler()
+        viewModel.isLoading.observe(viewLifecycleOwner){
+            binding.rvSchedule.isVisible = !it
+
+            when {
+                it -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+                else -> {
+                    binding.progressBar.visibility = View.GONE
+                }
+            }
+        }
         viewModel.studentSchedule.observe(viewLifecycleOwner){
             parentStudentAdapter = ParentStudentScheduleAdapter(it)
             parentStudentAdapter.differ.submitList(it)

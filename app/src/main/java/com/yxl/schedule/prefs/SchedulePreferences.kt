@@ -2,6 +2,7 @@ package com.yxl.schedule.prefs
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -19,6 +20,7 @@ class SchedulePreferences @Inject constructor (@ApplicationContext val context: 
     private val weekNumber = stringPreferencesKey("week_number")
     private val groupNumber = stringPreferencesKey("group_number")
     private val subgroupNumber = stringPreferencesKey("subgroup_number")
+    private val teacher = stringPreferencesKey("teacher_key")
 
     suspend fun setGroup(group: String){
         context.dataStore.edit {
@@ -38,6 +40,12 @@ class SchedulePreferences @Inject constructor (@ApplicationContext val context: 
         }
     }
 
+    suspend fun setTeacher(teacher: String){
+        context.dataStore.edit {
+            it[this.teacher] = teacher
+        }
+    }
+
     val getGroup : Flow<String?> = context.dataStore.data.map{
         it[groupNumber]
     }
@@ -48,6 +56,10 @@ class SchedulePreferences @Inject constructor (@ApplicationContext val context: 
 
     val getWeekNumber : Flow<String?> = context.dataStore.data.map{
         it[weekNumber]
+    }
+
+    val getTeacher : Flow<String?> = context.dataStore.data.map {
+        it[teacher]
     }
 
 }

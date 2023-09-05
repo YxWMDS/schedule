@@ -2,6 +2,8 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="0dp"
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
@@ -15,6 +17,8 @@
             android:id="@+id/tvDay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Theme.Schedule"
+            android:textStyle="bold"
             android:text="Понедельник"
             android:textSize="19sp"
             android:layout_marginStart="10dp"
