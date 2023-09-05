@@ -1,9 +1,9 @@
 package com.yxl.schedule.data
 
 import com.yxl.schedule.utils.Constants
-import com.yxl.schedule.model.Groups
-import com.yxl.schedule.model.ScheduleData
-import com.yxl.schedule.model.ProfessorData
+import com.yxl.schedule.data.model.Groups
+import com.yxl.schedule.data.model.ScheduleData
+import com.yxl.schedule.data.model.ProfessorData
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -17,7 +17,8 @@ interface ScheduleApi {
     suspend fun getStudentSchedule(
         @Query("group") group: String,
         @Query("subgroup") subgroup: String,
-        @Query("weekdays[]") weekdays: String
+        @Query("weekdays[]") weekdays: String,
+        @Query("weeks[]") weeks: String
     ): Response<ScheduleData>
 
     @Headers("Content-Type: application/json", "Accept: application/json")

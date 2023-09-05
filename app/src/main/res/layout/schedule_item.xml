@@ -3,19 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp"
-    android:layout_marginStart="6dp"
-    android:layout_marginEnd="6dp"
+    android:layout_margin="4dp"
     app:cardCornerRadius="5dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:ignore="HardcodedText">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tvStartTime"
@@ -42,10 +37,11 @@
             android:id="@+id/tvSubName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            style="@style/Theme.Schedule"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="80dp"
+            android:layout_marginEnd="32dp"
             android:text="Практ. грамматика"
-            android:textColor="@color/black"
+            android:textStyle="bold"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tvStartTime"
@@ -68,6 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:text="ст.пр. Гурьева С. С."
             app:layout_constraintStart_toEndOf="@id/tvEndTime"
             app:layout_constraintTop_toBottomOf="@id/tvSubType" />
@@ -76,11 +73,10 @@
             android:id="@+id/tvSubRoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:layout_marginEnd="32dp"
             android:text="Д409"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tvSubName"
             app:layout_constraintTop_toTopOf="@+id/tvSubName" />
 
         <View

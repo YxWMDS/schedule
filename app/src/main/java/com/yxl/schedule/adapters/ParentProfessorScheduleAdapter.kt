@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.yxl.schedule.databinding.ScheduleProfessorDayItemBinding
-import com.yxl.schedule.model.ProfessorDayData
+import com.yxl.schedule.data.model.ProfessorDayData
 
 class ParentProfessorScheduleAdapter(private val scheduleList: List<ProfessorDayData>) : RecyclerView.Adapter<ParentProfessorScheduleAdapter.ViewHolder>() {
 

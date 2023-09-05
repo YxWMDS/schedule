@@ -15,6 +15,7 @@
             android:id="@+id/tvDay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Theme.Schedule"
             android:text="Понедельник"
             android:textColor="@color/black"
             android:textSize="18sp"
