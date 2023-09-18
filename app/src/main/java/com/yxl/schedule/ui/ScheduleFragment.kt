@@ -67,7 +67,18 @@ class ScheduleFragment : Fragment() {
 
     private fun getProfessorSchedule() {
         setUpRecycler()
+        viewModel.isLoading.observe(viewLifecycleOwner){
+            binding.rvSchedule.isVisible = !it
 
+            when {
+                it -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+                else -> {
+                    binding.progressBar.visibility = View.GONE
+                }
+            }
+        }
         viewModel.professorSchedule.observe(viewLifecycleOwner) {
             parentProfessorAdapter = ParentProfessorScheduleAdapter(it)
             parentProfessorAdapter.differ.submitList(it)

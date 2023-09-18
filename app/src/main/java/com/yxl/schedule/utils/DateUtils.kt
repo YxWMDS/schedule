@@ -1,28 +1,18 @@
 package com.yxl.schedule.utils
 
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.WeekFields
 import java.util.Calendar
 
 object DateUtils {
 
-    val now = LocalDate.now()
-    const val week = Calendar.WEEK_OF_MONTH
-
-    val weekOfMonth = when(week + 1){
-        1 -> 2
-        2 -> 3
-        3 -> 4
-        4 -> 1
-        else -> {0}
-    }
+    private val now = LocalDate.now()
+    var week = Calendar.WEEK_OF_MONTH
 
     fun setUpDate(position: Int, current: Int): String?{
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        val day = LocalDate.now().dayOfWeek.value
-        val date = LocalDate.now().minusDays((day - 1).toLong())
+        val day = now.dayOfWeek.value
+        val date = now.minusDays((day - 1).toLong())
         val startWeek: String
         val endWeek: String
 

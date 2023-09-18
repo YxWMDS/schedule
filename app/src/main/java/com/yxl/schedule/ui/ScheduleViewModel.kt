@@ -28,7 +28,7 @@ class ScheduleViewModel @Inject constructor(
     val studentSchedule: MutableLiveData<List<StudentDayData>> = MutableLiveData()
     val professorSchedule: MutableLiveData<List<ProfessorDayData>> = MutableLiveData()
     val groups: MutableLiveData<List<String>> = MutableLiveData()
-    var weekNumber = MutableLiveData(DateUtils.weekOfMonth)
+    var weekNumber = MutableLiveData(DateUtils.week)
     val isLoading = MutableLiveData(false)
     val isGroupsLoaded = MutableLiveData(false)
     init {
@@ -58,10 +58,6 @@ class ScheduleViewModel @Inject constructor(
         groups.postValue(res)
     }
 
-//    fun setWeekNumber(week: Int) = viewModelScope.launch{
-//        weekNumber.emit(week)
-//    }
-
     fun getStudentScheduleWeek(group: String, subgroup: String) = viewModelScope.launch{
         isLoading.value = true
         val list = mutableListOf<StudentDayData>()
@@ -81,6 +77,7 @@ class ScheduleViewModel @Inject constructor(
     }
 
     fun getProfessorScheduleWeek(teacher: String?) = viewModelScope.launch {
+        isLoading.value = true
         val list = mutableListOf<ProfessorDayData>()
         if(!teacher.isNullOrEmpty()){
             for(i in Constants.dayNames.indices){
@@ -88,6 +85,10 @@ class ScheduleViewModel @Inject constructor(
             }
         }
         professorSchedule.postValue(list)
+        if (teacher != null) {
+            preferences.setTeacher(teacher)
+        }
+        isLoading.value = false
     }
 
     private fun tryGetStSchedule() = viewModelScope.launch{
@@ -106,6 +107,5 @@ class ScheduleViewModel @Inject constructor(
         )
     }
 
-
-
+    fun currentGroup() = preferences.getGroup
 }
