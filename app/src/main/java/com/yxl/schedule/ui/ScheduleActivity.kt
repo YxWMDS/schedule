@@ -4,31 +4,24 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.yxl.schedule.R
 import com.yxl.schedule.adapters.ViewPagerAdapter
 import com.yxl.schedule.databinding.ActivityScheduleBinding
-import com.yxl.schedule.utils.Constants
+import com.yxl.schedule.ui.dialog.SearchDialogFragment
 import com.yxl.schedule.utils.DateUtils
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.WeekFields
 
 @AndroidEntryPoint
 class ScheduleActivity : AppCompatActivity() {
     private lateinit var binding: ActivityScheduleBinding
     private lateinit var adapter: ViewPagerAdapter
     private val viewModel: ScheduleViewModel by viewModels()
-    private lateinit var pager: ViewPager2
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityScheduleBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        pager = ViewPager2(this)
         setUpViewPager()
         setUpToolbar()
 
@@ -64,14 +57,12 @@ class ScheduleActivity : AppCompatActivity() {
         viewModel.weekNumber.observe(this@ScheduleActivity){
             toolbar.toolbarWeek.text = "$it Неделя"
         }
-
-//        toolbar.toolbarWeek.text = "${viewModel.weekNumber.value} Неделя"
     }
 
     private fun setUpViewPager(){
         adapter = ViewPagerAdapter(supportFragmentManager, lifecycle)
         binding.pager.adapter = adapter
-        binding.pager.setCurrentItem(DateUtils.weekOfMonth - 1, true)
+        binding.pager.setCurrentItem(DateUtils.week - 1, true)
 
         TabLayoutMediator(binding.tabLayout, binding.pager){tab, position ->
             tab.text = DateUtils.setUpDate(position, binding.pager.currentItem)
